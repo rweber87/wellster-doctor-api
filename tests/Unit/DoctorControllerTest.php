@@ -46,6 +46,11 @@ class DoctorControllerTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonCount(3);
+
+        $patientsArray = $response->json();
+        $lastNameOrder = array_column($patientsArray, 'last_name');
+
+        $this->assertEquals($lastNameOrder, collect($lastNameOrder)->sort()->values()->toArray());
     }
 
     /** @test */
@@ -66,6 +71,11 @@ class DoctorControllerTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonCount(3);
+
+        $patientsArray = $response->json();
+        $appointmentDates = array_column($patientsArray, 'appointment_date');
+
+        $this->assertEquals($appointmentDates, collect($appointmentDates)->sort()->values()->toArray());
     }
 
     /** @test */
