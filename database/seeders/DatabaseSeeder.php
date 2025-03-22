@@ -27,12 +27,12 @@ class DatabaseSeeder extends Seeder
         $indicationIds = Indication::pluck('id')->toArray();
 
         $doctors = Doctor::factory(10)->create()->each(function ($doctor) use ($faker, $indicationIds) {
-            $doctorIndications = $faker->randomElements($indicationIds, rand(2, 4)); // doctors can treat 2 to 4 indications
+            $doctorIndications = $faker->randomElements($indicationIds, rand(2, 4));
             $doctor->indications()->attach($doctorIndications);
         });
 
         $patients = Patient::factory(30)->create()->each(function ($patient) use ($faker, $indicationIds) {
-            $patientIndications = $faker->randomElements($indicationIds, rand(1, 2)); // patients can have 1 or 2 indications
+            $patientIndications = $faker->randomElements($indicationIds, rand(1, 2));
             $patient->indications()->attach($patientIndications);
         });
 
