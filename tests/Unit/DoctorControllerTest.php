@@ -32,7 +32,7 @@ class DoctorControllerTest extends TestCase
     public function it_can_return_patients_for_a_doctor_sorted_by_last_name()
     {
         $doctor = Doctor::factory()->create();
-        $patients = Patient::factory(3)->create()->sortBy('last_name');
+        $patients = Patient::factory(3)->create();
 
         foreach ($patients as $patient) {
             Assignment::create([
@@ -49,23 +49,23 @@ class DoctorControllerTest extends TestCase
 
         $patientsArray = $response->json();
         $lastNameOrder = array_column($patientsArray, 'last_name');
+        $patientsSortedLastName = $patients->sortBy('last_name')->pluck('last_name')->toArray();
 
-        $this->assertEquals($lastNameOrder, collect($lastNameOrder)->sort()->values()->toArray());
+        $this->assertEquals($lastNameOrder, $patientsSortedLastName);
+        $this->assertNotEquals($lastNameOrder, array_reverse($patientsSortedLastName));
     }
 
     /** @test */
     public function it_can_return_patients_for_a_doctor_sorted_by_appointment_date()
     {
         $doctor = Doctor::factory()->create();
-        $patients = Patient::factory(3)->create();
-
-        foreach ($patients as $patient) {
+        $patients = Patient::factory(3)->create()->each(function ($patient, $index) use ($doctor) {
             Assignment::create([
                 'doctor_id' => $doctor->id,
                 'patient_id' => $patient->id,
-                'appointment_date' => now()->addDays(rand(1, 30)),
+                'appointment_date' => now()->addDays($index * 5),
             ]);
-        }
+        });
 
         $response = $this->getJson("/api/doctors/{$doctor->id}/patients?sort_by=appointment_date");
 
@@ -74,8 +74,10 @@ class DoctorControllerTest extends TestCase
 
         $patientsArray = $response->json();
         $appointmentDates = array_column($patientsArray, 'appointment_date');
+        $formattedDates = array_map(fn ($date) => \Carbon\Carbon::parse($date)->toDateString(), $appointmentDates);
+        $expectedSortedDates = collect($formattedDates)->sort()->values()->toArray();
 
-        $this->assertEquals($appointmentDates, collect($appointmentDates)->sort()->values()->toArray());
+        $this->assertSame($expectedSortedDates, $formattedDates, 'The appointment_date field is not sorted correctly.');
     }
 
     /** @test */
