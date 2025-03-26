@@ -10,7 +10,7 @@ class DoctorController extends Controller
 {
     public function show(Doctor $doctor)
     {
-        return response()->json($doctor);
+        return response()->json($doctor->load(['patients', 'assignments', 'indications']));
     }
 
     public function patients(Doctor $doctor)
@@ -74,3 +74,5 @@ class DoctorController extends Controller
         ]);
     }
 }
+
+// curl -X POST "http://127.0.0.1:8000/api/doctors/10/assign-patient/45" -H "Content-Type: application/json" -H "Accept: application/json" -d '{}'
