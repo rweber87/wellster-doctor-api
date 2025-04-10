@@ -13,8 +13,7 @@ class DoctorControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function it_can_show_a_doctor()
+    public function test_it_can_show_a_doctor()
     {
         $doctor = Doctor::factory()->create();
 
@@ -28,8 +27,7 @@ class DoctorControllerTest extends TestCase
             ]);
     }
 
-    /** @test */
-    public function it_can_return_patients_for_a_doctor_sorted_by_last_name()
+    public function test_it_can_return_patients_for_a_doctor_sorted_by_last_name()
     {
         $doctor = Doctor::factory()->create();
         $patients = Patient::factory(3)->create();
@@ -55,8 +53,7 @@ class DoctorControllerTest extends TestCase
         $this->assertNotEquals($lastNameOrder, array_reverse($patientsSortedLastName));
     }
 
-    /** @test */
-    public function it_can_return_patients_for_a_doctor_sorted_by_appointment_date()
+    public function test_it_can_return_patients_for_a_doctor_sorted_by_appointment_date()
     {
         $doctor = Doctor::factory()->create();
         $patients = Patient::factory(3)->create()->each(function ($patient, $index) use ($doctor) {
@@ -80,8 +77,7 @@ class DoctorControllerTest extends TestCase
         $this->assertSame($expectedSortedDates, $formattedDates, 'The appointment_date field is not sorted correctly.');
     }
 
-    /** @test */
-    public function it_can_return_unassigned_patients_matching_doctors_indications()
+    public function test_it_can_return_unassigned_patients_matching_doctors_indications()
     {
         $doctor = Doctor::factory()->create();
         $indication = Indication::factory()->create(['name' => 'Diabetes']);
@@ -98,8 +94,7 @@ class DoctorControllerTest extends TestCase
             ->assertJsonFragment(['id' => $matchingPatient->id]);
     }
 
-    /** @test */
-    public function it_can_assign_a_patient_to_a_doctor()
+    public function test_it_can_assign_a_patient_to_a_doctor()
     {
         $doctor = Doctor::factory()->create();
         $patient = Patient::factory()->create();
@@ -114,8 +109,7 @@ class DoctorControllerTest extends TestCase
             ->assertJsonFragment(['message' => 'Patient assigned to doctor successfully.']);
     }
 
-    /** @test */
-    public function it_prevents_assigning_a_patient_to_multiple_doctors()
+    public function test_it_prevents_assigning_a_patient_to_multiple_doctors()
     {
         $doctor1 = Doctor::factory()->create();
         $doctor2 = Doctor::factory()->create();

@@ -18,6 +18,9 @@ class DoctorController extends Controller
         $sortBy = request()->get('sort_by', 'appointment_date');
         $direction = request()->get('direction', 'asc');
 
+        // TODO: Validate direction and sort_by
+        // TODO: Use an enum or constant for comparative in sortBy
+
         $patients = $doctor->patients()->with('assignments')
             ->when($sortBy === 'last_name', function ($query) use ($direction) {
                 $query->orderBy('last_name', $direction);
@@ -31,11 +34,13 @@ class DoctorController extends Controller
             })
             ->get();
 
-        return response()->json($patients);
+        return response()->json($patients->load('indications'));
     }
 
     public function matches(Doctor $doctor)
     {
+        // TODO: Include indications in returned patients
+
         $indicationIds = $doctor->indications->pluck('id');
         $patients = Patient::doesntHave('assignments')
             ->whereHas('indications', function ($query) use ($indicationIds) {
@@ -43,11 +48,13 @@ class DoctorController extends Controller
             })
             ->get();
 
-        return response()->json($patients);
+        return response()->json($patients->load('indications'));
     }
 
     public function assignPatient(Doctor $doctor, Patient $patient)
     {
+        // TODO: either add endpoint or allow param from client that sets specific date
+
         $existingAssignment = Assignment::where('patient_id', $patient->id)->exists();
 
         if ($existingAssignment) {
@@ -70,9 +77,7 @@ class DoctorController extends Controller
 
         return response()->json([
             'message' => 'Patient assigned to doctor successfully.',
-            'doctor' => $doctor->with('assignments')->first(),
+            'doctor' => $doctor->load('assignments'),
         ]);
     }
 }
-
-// curl -X POST "http://127.0.0.1:8000/api/doctors/10/assign-patient/45" -H "Content-Type: application/json" -H "Accept: application/json" -d '{}'

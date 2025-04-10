@@ -11,8 +11,7 @@ class PatientControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function it_can_return_unassigned_patients()
+    public function test_it_can_return_unassigned_patients()
     {
         $unassignedPatients = Patient::factory(3)->create();
         $assignedPatient = Patient::factory()->create();
